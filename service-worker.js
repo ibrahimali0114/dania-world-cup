@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dania-world-cup-v2';
+const CACHE_NAME = 'dania-world-cup-v3-flags';
 const ASSETS = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
