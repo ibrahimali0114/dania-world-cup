@@ -108,17 +108,18 @@ function findEvent(a,b){
 }
 function parseEvent(ev){
   const comp = ev.competitions?.[0] || {};
-  const competitors = comp.competitors || [];
+  const competitors = comp.competitors || ev.competitors || [];
 
   return {
     date: ev.date,
-    status: (ev.status && ev.status.type && ev.status.type.state) ? ev.status.type.state : 'pre',
-    detail: ev.status?.type?.shortDetail || ev.status?.type?.description || '',
-    venue: comp.venue?.fullName || '',
-    teams: competitors.map(c=>({
-      name: c.team?.displayName || c.team?.shortDisplayName || c.team?.abbreviation || '',
-      score: c.score ?? '',
-      winner: !!c.winner
+    status: ev.status?.type?.state || ev.status?.state || 'pre',
+    detail: ev.status?.type?.shortDetail || ev.status?.detail || '',
+    venue: comp.venue?.fullName || ev.venue || '',
+    teams: competitors.map(c => ({
+      name: c.team?.displayName || c.team?.name || '',
+      score: c.score || '',
+      winner: !!c.winner,
+      logo: c.team?.logo || ''
     }))
   };
 }
