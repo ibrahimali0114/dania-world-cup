@@ -158,12 +158,47 @@ async function loadLive(){
 function formatDate(dt,fallback){if(!dt)return fallback;const d=new Date(dt);if(Number.isNaN(+d))return fallback;const mode=document.getElementById('timeMode').value;return d.toLocaleString([],mode==='et'?{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/New_York'}:{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}
 function formatSchedule(dt){return formatDate(dt,dt||'TBD');}
 function countdown(dt){if(!dt)return '';const ms=new Date(dt)-new Date();if(ms<=0)return '';const d=Math.floor(ms/86400000),h=Math.floor(ms%86400000/3600000),m=Math.floor(ms%3600000/60000);return `Starts in ${d?d+'d ':''}${h}h ${m}m`;}
-function blankMatch(id,teams,fbDate){const e=findEvent(teams[0],teams[1]);let status=e?.status||'pre';let scores=e&&status!=='pre'?e.teams.map(t=>t.score):['',''];let winners=e&&status==='post'?e.teams.map(t=>t.winner):[false,false];let venue=e?.venue||'';let live=status==='in';let detail=e?.detail||countdown(e?.date||fbDate)||'Not started';
-  // Built-in confirmed fallback: Canada defeated South Africa 1-0 in this Round of 32 match.
-  if(!e && norm(teams[0])==='south africa' && norm(teams[1])==='canada'){status='post';scores=['0','1'];winners=[false,true];detail='FT';}
-  const idxA=e&&norm(e.teams[0]?.name)===norm(teams[0])?0:e?1:0;
-  const idxB=e&&norm(e.teams[0]?.name)===norm(teams[1])?0:e?1:1;
-  return {id,teams:[{name:teams[0],score:scores[idxA]||'',winner:winners[idxA]},{name:teams[1],score:scores[idxB]||'',winner:winners[idxB]}],date:formatDate(e?.date||fbDate,fbDate),rawDate:e?.date||fbDate,venue,status,detail,live}}
+function blankMatch(id, teams, fbDate){
+  const e = findEvent(teams[0], teams[1]);
+
+  let status = e?.status || 'pre';
+  let venue = e?.venue || '';
+
+  let scores = (e && e.teams && e.teams.length === 2)
+    ? e.teams.map(t => t.score)
+    : ['',''];
+
+  // FIX: correct winner logic from real scores only
+  let winners = (scores[0] !== '' && scores[1] !== '' && !isNaN(scores[0]) && !isNaN(scores[1]))
+    ? [
+        Number(scores[0]) > Number(scores[1]),
+        Number(scores[1]) > Number(scores[0])
+      ]
+    : [false, false];
+
+  let detail = e?.detail || 'Not started';
+
+  // OPTIONAL fallback (keep if you want)
+  if(!e && norm(teams[0])==='south africa' && norm(teams[1])==='canada'){
+    status='post';
+    scores=['0','1'];
+    winners=[false,true];
+    detail='FT';
+  }
+
+  return {
+    id,
+    teams: [
+      { name: teams[0], score: scores[0] || '', winner: winners[0] },
+      { name: teams[1], score: scores[1] || '', winner: winners[1] }
+    ],
+    date: formatDate(e?.date || fbDate, fbDate),
+    rawDate: e?.date || fbDate,
+    venue,
+    status,
+    detail
+  };
+}
 function winnerOf(m){
   if(!m || !m.teams) return 'TBD';
 
