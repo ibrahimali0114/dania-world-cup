@@ -91,9 +91,12 @@ function norm(s){
     .toLowerCase()
     .replace(/&/g,'and')
     .replace(/\./g,'')
-    .replace(/u\.?s\.?a\.?/g,'usa')
-    .replace(/united states.*/g,'usa')
     .replace(/[^a-z0-9 ]/g,'')
+    .replace(/\busa\b/g,'united states')
+    .replace(/\bunited states of america\b/g,'united states')
+    .replace(/\bcote divoire\b/g,'ivory coast')
+    .replace(/\bcongo dr\b/g,'dr congo')
+    .replace(/\bdr congo\b/g,'dr congo')
     .trim();
 }
 function findEvent(a,b){
