@@ -106,7 +106,22 @@ function findEvent(a,b){
     return t.includes(na) && t.includes(nb);
   });
 }
-function parseEvent(ev){const comp=ev.competitions?.[0]||{};const competitors=comp.competitors||[];return {date:ev.date,status:ev.status?.type?.state||'pre',detail:ev.status?.type?.shortDetail||ev.status?.type?.description||'',venue:comp.venue?.fullName||'',teams:competitors.map(c=>({name:c.team?.displayName||c.team?.shortDisplayName||'',score:c.score,winner:!!c.winner,logo:c.team?.logo||''}))}}
+function parseEvent(ev){
+  const comp = ev.competitions?.[0] || {};
+  const competitors = comp.competitors || [];
+
+  return {
+    date: ev.date,
+    status: (ev.status && ev.status.type && ev.status.type.state) ? ev.status.type.state : 'pre',
+    detail: ev.status?.type?.shortDetail || ev.status?.type?.description || '',
+    venue: comp.venue?.fullName || '',
+    teams: competitors.map(c=>({
+      name: c.team?.displayName || c.team?.shortDisplayName || c.team?.abbreviation || '',
+      score: c.score ?? '',
+      winner: !!c.winner
+    }))
+  };
+}
 async function fetchScoreboard(url){
   const r=await fetch(url,{cache:'no-store'});
   if(!r.ok) throw new Error('Scoreboard fetch failed '+r.status);
