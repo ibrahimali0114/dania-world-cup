@@ -96,7 +96,13 @@ function norm(s){
     .replace(/[^a-z0-9 ]/g,'')
     .trim();
 }
-function findEvent(a,b){const na=norm(a),nb=norm(b);return liveEvents.find(e=>{let t=e.teams.map(x=>norm(x.name));return t.includes(na)&&t.includes(nb)})}
+function findEvent(a,b){
+  const na = norm(a), nb = norm(b);
+  return liveEvents.find(e=>{
+    const t = (e.teams||[]).map(x=>norm(x.name));
+    return t.includes(na) && t.includes(nb);
+  });
+}
 function parseEvent(ev){const comp=ev.competitions?.[0]||{};const competitors=comp.competitors||[];return {date:ev.date,status:ev.status?.type?.state||'pre',detail:ev.status?.type?.shortDetail||ev.status?.type?.description||'',venue:comp.venue?.fullName||'',teams:competitors.map(c=>({name:c.team?.displayName||c.team?.shortDisplayName||'',score:c.score,winner:!!c.winner,logo:c.team?.logo||''}))}}
 async function fetchScoreboard(url){
   const r=await fetch(url,{cache:'no-store'});
