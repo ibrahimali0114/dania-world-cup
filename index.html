@@ -86,7 +86,16 @@ const qfDates=['2026-07-09T16:00:00-04:00','2026-07-10T15:00:00-04:00','2026-07-
 const sfDates=['2026-07-14T15:00:00-04:00','2026-07-15T15:00:00-04:00'];
 const finalDate='2026-07-19T15:00:00-04:00';
 let zoom=1, liveEvents=[];
-function norm(s){return (s||'').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9 ]/g,'').replace(/united states|usa/g,'usa').replace(/cote divoire|ivory coast/g,'ivory coast').replace(/congo dr|dr congo/g,'dr congo').trim()}
+function norm(s){
+  return (s||'')
+    .toLowerCase()
+    .replace(/&/g,'and')
+    .replace(/\./g,'')
+    .replace(/u\.?s\.?a\.?/g,'usa')
+    .replace(/united states.*/g,'usa')
+    .replace(/[^a-z0-9 ]/g,'')
+    .trim();
+}
 function findEvent(a,b){const na=norm(a),nb=norm(b);return liveEvents.find(e=>{let t=e.teams.map(x=>norm(x.name));return t.includes(na)&&t.includes(nb)})}
 function parseEvent(ev){const comp=ev.competitions?.[0]||{};const competitors=comp.competitors||[];return {date:ev.date,status:ev.status?.type?.state||'pre',detail:ev.status?.type?.shortDetail||ev.status?.type?.description||'',venue:comp.venue?.fullName||'',teams:competitors.map(c=>({name:c.team?.displayName||c.team?.shortDisplayName||'',score:c.score,winner:!!c.winner,logo:c.team?.logo||''}))}}
 async function fetchScoreboard(url){
