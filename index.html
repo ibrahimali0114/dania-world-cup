@@ -165,20 +165,20 @@ function blankMatch(id,teams,fbDate){const e=findEvent(teams[0],teams[1]);let st
   const idxB=e&&norm(e.teams[0]?.name)===norm(teams[1])?0:e?1:1;
   return {id,teams:[{name:teams[0],score:scores[idxA]||'',winner:winners[idxA]},{name:teams[1],score:scores[idxB]||'',winner:winners[idxB]}],date:formatDate(e?.date||fbDate,fbDate),rawDate:e?.date||fbDate,venue,status,detail,live}}
 function winnerOf(m){
-  if(!m || !m.teams || !m.teams.length) return 'TBD';
+  if(!m || !m.teams) return 'TBD';
 
   const a = m.teams[0];
   const b = m.teams[1];
 
-  const sa = Number(a?.score);
-  const sb = Number(b?.score);
+  const sa = Number(a.score);
+  const sb = Number(b.score);
 
-  if(Number.isFinite(sa) && Number.isFinite(sb)){
-    if(sa > sb) return a.name;
-    if(sb > sa) return b.name;
-  }
+  if(!Number.isFinite(sa) || !Number.isFinite(sb)) return 'TBD';
 
-  return (a && a.winner) ? a.name : (b && b.name ? b.name : 'TBD');
+  if(sa > sb) return a.name;
+  if(sb > sa) return b.name;
+
+  return 'TBD';
 }
 function derivedMatch(id,a,b,roundDate){const dt=formatSchedule(roundDate);return {id,teams:[{name:a,score:'',winner:false},{name:b,score:'',winner:false}],date:dt,rawDate:roundDate,venue:'',status:'pre',detail:a==='TBD'||b==='TBD'?'Waiting on prior round':(countdown(roundDate)||'Not started'),live:false}}
 function teamRow(t,complete){const cls=complete?(t.winner?'winner':'loser'):'';return `<div class="team ${cls}"><div onclick="showTeam('${t.name.replace(/'/g,"\\'")}')" class="name"><span class="flag">${flagImg(t.name)}</span><span>${t.name}</span></div><div class="score">${t.score??''}</div></div>`}
