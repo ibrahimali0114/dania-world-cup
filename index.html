@@ -162,46 +162,42 @@ function liveLabel(m){const min=getMinute(m.detail);return `<span class="liveBad
 function progressPct(m){const min=getMinute(m.detail);return min?Math.max(1,Math.min(100,Math.round(min/90*100))):10}
 function card(m,label){let done=m.status==='post',live=m.status==='in';let statusHtml=done?'<span class="statusBadge completed">FT</span>':live?liveLabel(m):`<span class="statusBadge upcoming">${label?label:'UPCOMING'}</span>`;let progress=live?`<div class="progressWrap"><div class="progressBar" style="width:${progressPct(m)}%"></div></div>`:'';let scoreKey=m.teams.map(t=>`${t.name}:${t.score}`).join('|');let statusClass=done?'completed':live?'live':'upcoming';return `<div class="match clickable ${statusClass}" data-id="${m.id}" data-teams="${m.teams.map(t=>t.name.toLowerCase()).join(' ')}" data-date="${m.rawDate||''}" data-scorekey="${scoreKey}" onclick="showMatch('${m.id}')"><div class="meta"><span>${m.date}</span><span class="${done?'completed':live?'liveText':'scheduled'}">${statusHtml}</span></div>${progress}<div class="teams">${teamRow(m.teams[0],done)}${teamRow(m.teams[1],done)}</div><div class="venue"><span>${m.venue||' '}</span><span>${live?m.detail:(m.detail||'')}</span></div></div>`}
 function buildMatches(){
-  let r32 = r32Pairs.map((p,i)=>
-    blankMatch('r32_'+i,p,staticDates[i])
-  );
+  let r32 = r32Pairs.map((p,i)=>blankMatch('r32_'+i,p,staticDates[i]));
 
+  // Round of 16 = NO PREDICTION (TBD only)
   let r16 = [];
   for(let i=0;i<16;i+=2){
-    r16.push(
-      derivedMatch(
-        'r16_'+i/2,
-        'TBD',
-        'TBD',
-        r16Dates[i/2]
-      )
-    );
+    r16.push(derivedMatch(
+      'r16_'+i/2,
+      'TBD',
+      'TBD',
+      r16Dates[i/2]
+    ));
   }
 
+  // Quarterfinals = TBD only
   let qf = [];
   for(let i=0;i<8;i+=2){
-    qf.push(
-      derivedMatch(
-        'qf_'+i/2,
-        'TBD',
-        'TBD',
-        qfDates[i/2]
-      )
-    );
+    qf.push(derivedMatch(
+      'qf_'+i/2,
+      'TBD',
+      'TBD',
+      qfDates[i/2]
+    ));
   }
 
+  // Semifinals = TBD only
   let sf = [];
   for(let i=0;i<4;i+=2){
-    sf.push(
-      derivedMatch(
-        'sf_'+i/2,
-        'TBD',
-        'TBD',
-        sfDates[i/2]
-      )
-    );
+    sf.push(derivedMatch(
+      'sf_'+i/2,
+      'TBD',
+      'TBD',
+      sfDates[i/2]
+    ));
   }
 
+  // Final = TBD only
   let final = derivedMatch(
     'final',
     'TBD',
@@ -209,7 +205,7 @@ function buildMatches(){
     finalDate
   );
 
-  return {r32,r16,qf,sf,final};
+  return {r32, r16, qf, sf, final};
 }
 let current={};function render(){current=buildMatches();let {r32,r16,qf,sf,final}=current;let html=`<div class="col"><h2>ROUND OF 32</h2><div class="roundDates">Jun 28 – Jul 3</div>${r32.slice(0,8).map((m,i)=>`<div class="slot r32a${i}">${card(m)}</div>`).join('')}</div><div class="col"><h2>ROUND OF 16</h2><div class="roundDates">Winners advance</div>${r16.slice(0,4).map((m,i)=>`<div class="slot r16a${i}">${card(m)}</div>`).join('')}</div><div class="col"><h2>QUARTERFINALS</h2><div class="roundDates">Winners advance</div>${qf.slice(0,2).map((m,i)=>`<div class="slot qfa${i}">${card(m)}</div>`).join('')}</div><div class="col"><h2>SEMIFINALS</h2><div class="roundDates">Winners advance</div><div class="slot sfa0">${card(sf[0])}</div></div><div class="center"><div class="logo"><div class="trophy">🏆</div>FIFA<br>WORLD CUP</div><div class="finalSlot">${card(final,'FINAL')}</div></div><div class="col"><h2>SEMIFINALS</h2><div class="roundDates">Winners advance</div><div class="slot sfb0">${card(sf[1])}</div></div><div class="col"><h2>QUARTERFINALS</h2><div class="roundDates">Winners advance</div>${qf.slice(2,4).map((m,i)=>`<div class="slot qfb${i}">${card(m)}</div>`).join('')}</div><div class="col"><h2>ROUND OF 16</h2><div class="roundDates">Winners advance</div>${r16.slice(4,8).map((m,i)=>`<div class="slot r16b${i}">${card(m)}</div>`).join('')}</div><div class="col"><h2>ROUND OF 32</h2><div class="roundDates">Jun 29 – Jul 3</div>${r32.slice(8,16).map((m,i)=>`<div class="slot r32b${i}">${card(m)}</div>`).join('')}</div>`;
 bracket.innerHTML=html;renderUpcoming();applyZoom();postRenderEnhancements();}
